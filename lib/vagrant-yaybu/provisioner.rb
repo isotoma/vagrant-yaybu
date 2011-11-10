@@ -107,7 +107,24 @@ module Vagrant
       def prepare
       end
 
+      def verify_import(mod)
+          if not system("#{config.python}", "-c", "import #{mod}") then
+            raise YaybuError.new "Module #{mod} not found"
+          end
+      end
+
+      def verify_local_binary(binary)
+          if not system("which #{binary}") then
+            raise YaybuError.new "Local binary #{binary} not found"
+          end
+      end
+
       def provision!
+        verify_import "yaybu"
+        verify_import "yay"
+
+        verify_local_binary "ssh"
+
         bootstrap
 
         deployment_script = TemplateRenderer.render_string($deploy_script, {

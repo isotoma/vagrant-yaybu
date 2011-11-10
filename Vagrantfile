@@ -27,7 +27,7 @@ Vagrant::Config.run do |config|
       resources.append:
         - Execute:
             name: example
-            comamnd: date
+            command: date
     EOS
 
     # Advanced Yaybu hackers might not want to use the default python or a packaged
