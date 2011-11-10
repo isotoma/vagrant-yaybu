@@ -8,15 +8,14 @@ require "lib/vagrant-yaybu/provisioner.rb"
 
 Vagrant::Config.run do |config|
   config.vm.box = "lucid64"
-  # config.vm.box_url = "http://domain.com/path/to/above.box"
-
+  config.vm.box_url = "http://files.vagrantup.com/lucid64.box"
 
   config.vm.provision :yaybu do |cfg|
 
     # You can add directories and remote locations to the search path
     # Both Yay files and assets (templates, etc) will be fetched from here.
     # The default search path is the current working directory
-    #cfg.searchpath << "file:///home/john/Projects/yaybu-configuration/"
+    cfg.searchpath << "../Projects/yaybu-configuration/"
     cfg.searchpath << "https://raw.github.com/isotoma/yaybu-examples/master/"
 
     # You can load any config that is on the searchpath
