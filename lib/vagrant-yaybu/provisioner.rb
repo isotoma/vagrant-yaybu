@@ -22,24 +22,38 @@ from yay.config import Config
 from yaybu.core.remote import RemoteRunner
 from yaybu.core.runcontext import RunContext
 
-raw_config = StringIO.StringIO("""
-<%= yay %>
-""")
-
-config = Config()
-config.load(raw_config)
-
 class opts:
     log_level = "info"
     logfile = "-"
     host = "<%= ssh_user %>@<%= ssh_host %>:<%= ssh_port %>"
     user = "root"
-    ypath = []
+    ypath = [
+<% searchpath.each do |path| %>
+        "<%= path %>",
+<% end %>
+        ]
     simulate = False
     verbose = False
     resume = True
     no_resume = False
     env_passthrough = []
+
+includes = StringIO.StringIO("""
+<% if includes.length > 0 %>
+.include:
+  <% includes.each do |include| %>
+  - <%= include %>
+  <% end %>
+<% end %>
+""")
+
+raw_config = StringIO.StringIO("""
+<%= yay %>
+""")
+
+config = Config(searchpath=opts.ypath)
+config.load(includes)
+config.load(raw_config)
 
 ctx = RunContext(None, opts)
 ctx.set_config(config)
@@ -66,10 +80,14 @@ module Vagrant
       class Config < Vagrant::Config::Base
         attr_accessor :yay
         attr_accessor :python
+        attr_accessor :searchpath
+        attr_accessor :include
 
         def initialize
           @yay = ""
           @python = "python"
+          @searchpath = []
+          @include = []
         end
       end
 
@@ -98,6 +116,8 @@ module Vagrant
           :ssh_port => vm.ssh.port,
           :private_key_path => vm.env.config.ssh.private_key_path,
           :yay => config.yay,
+          :searchpath => config.searchpath,
+          :includes => config.include,
           })
 
         IO.popen("#{config.python} -", "r+") do |io|
