@@ -1,18 +1,15 @@
 #! /bin/sh
 
-sudo aptitude install ruby1.8-dev ruby1.8 ri1.8 rdoc1.8 irb1.8 libreadline-ruby1.8 libruby1.8 libopenssl-ruby wget
-sudo ln -s /usr/bin/ruby1.8 /usr/bin/ruby
-sudo ln -s /usr/bin/ri1.8 /usr/bin/ri
-sudo ln -s /usr/bin/rdoc1.8 /usr/bin/rdoc
-sudo ln -s /usr/bin/irb1.8 /usr/bin/irb
+bash < <(curl -s https://rvm.beginrescueend.com/install/rvm)
 
-cd /tmp
-wget http://production.cf.rubygems.org/rubygems/rubygems-1.3.7.tgz
-tar xvzf rubygems-1.3.7.tgz
-cd rubygems-1.3.7
-sudo ruby setup.rb
-sudo ln -s /usr/bin/gem1.8 /usr/bin/gem
+echo '[[ -s "$HOME/.rvm/scripts/rvm" ]] && . "$HOME/.rvm/scripts/rvm"' >> ~/.bash_profile
 
-sudo gem update --system
-sudo gem install vagrant vagrant-snap vagrant-yaybu
+. "$HOME/.rvm/scripts/rvm"
+
+rvm install 1.9.2
+rvm use 1.9.2
+rvm --default 1.9.2
+
+gem update
+gem install vagrant vagrant-snap vagrant-yaybu
 
