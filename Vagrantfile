@@ -3,7 +3,7 @@
 # When you install this gem (using ``gem install vagrant-yaybu``) you do not
 # need to ``require`` the provisioner. We do so here so that the development
 # version is loaded.
-require "lib/vagrant-yaybu/provisioner.rb"
+# require "lib/vagrant-yaybu/provisioner.rb"
 
 
 Vagrant::Config.run do |config|
@@ -31,7 +31,7 @@ Vagrant::Config.run do |config|
 
     # Advanced Yaybu hackers might not want to use the default python or a packaged
     # version of Yaybu. You can set this to point at your development environment.
-    cfg.python = "/opt/virtualenvs/yaybu/bin/python"
+    # cfg.python = "/opt/virtualenvs/yaybu/bin/python"
 
   end
 end
