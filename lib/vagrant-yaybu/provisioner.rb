@@ -137,7 +137,7 @@ module Vagrant
           :includes => config.include,
           })
 
-        IO.popen("#{config.python} -", "r+") do |io|
+        IO.popen("#{config.python} -c 'import sys; exec(sys.stdin.read())'", "r+") do |io|
           io.write(deployment_script)
           io.close_write
 
