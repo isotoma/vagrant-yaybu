@@ -75,8 +75,6 @@ module Vagrant
     end
 
     class YaybuProvisioner < Base
-      register :yaybu
-
       class Config < Vagrant::Config::Base
         attr_accessor :yay
         attr_accessor :python
@@ -150,4 +148,6 @@ module Vagrant
 
   end
 end
+
+Vagrant.provisioners.register(:yaybu)         { Vagrant::Provisioners::YaybuProvisioner }
 
