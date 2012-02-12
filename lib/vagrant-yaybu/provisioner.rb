@@ -94,7 +94,7 @@ module Vagrant
           begin
             ssh.sudo!("which yaybu", :error_class => YaybuError, :_key => :yaybu_not_detected, :binary => "yaybu")
           rescue
-            env.ui.info "Yaybu not found so attmpting to install it"
+            env.ui.info "Yaybu not found so attempting to install it"
             ssh.sudo!("apt-get update")
             ssh.sudo!("apt-get install python-setuptools -y")
             ssh.sudo!("easy_install Yaybu")
