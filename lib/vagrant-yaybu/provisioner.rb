@@ -82,6 +82,8 @@ module Vagrant
         attr_accessor :include
 
         def initialize
+          super
+
           @yay = ""
           @python = "python"
           @searchpath = []
@@ -89,16 +91,19 @@ module Vagrant
         end
       end
 
+      def self.config_class
+        Config
+      end
+
       def bootstrap
-        vm.ssh.execute do |ssh|
-          begin
-            ssh.sudo!("which yaybu", :error_class => YaybuError, :_key => :yaybu_not_detected, :binary => "yaybu")
-          rescue
-            env.ui.info "Yaybu not found so attempting to install it"
-            ssh.sudo!("apt-get update")
-            ssh.sudo!("apt-get install python-setuptools -y")
-            ssh.sudo!("easy_install Yaybu")
-          end
+        ssh = env[:vm].channel
+        begin
+          ssh.sudo("which yaybu", :error_class => YaybuError, :_key => :yaybu_not_detected, :binary => "yaybu")
+        rescue
+          env[:ui].info "Yaybu not found so attempting to install it"
+          ssh.sudo("apt-get update")
+          ssh.sudo("apt-get install python-setuptools -y")
+          ssh.sudo("easy_install Yaybu")
         end
       end
 
@@ -126,10 +131,10 @@ module Vagrant
         bootstrap
 
         deployment_script = TemplateRenderer.render_string($deploy_script, {
-          :ssh_host => vm.env.config.ssh.host,
-          :ssh_user => vm.env.config.ssh.username,
-          :ssh_port => vm.ssh.port,
-          :private_key_path => vm.env.config.ssh.private_key_path,
+          :ssh_host => env[:vm].ssh.info[:host],
+          :ssh_user => env[:vm].ssh.info[:username],
+          :ssh_port => env[:vm].ssh.info[:port],
+          :private_key_path => env[:vm].ssh.info[:private_key_path],
           :yay => config.yay,
           :searchpath => config.searchpath,
           :includes => config.include,
@@ -140,7 +145,7 @@ module Vagrant
           io.close_write
 
           while line = io.gets do
-            env.ui.info("#{line}")
+            env[:ui].info("#{line}")
           end
         end
       end
