@@ -38,6 +38,10 @@ class opts:
     no_resume = False
     env_passthrough = []
 
+vagrant_config = StringIO.StringIO("""
+<%= vagrant %>
+""")
+
 includes = StringIO.StringIO("""
 <% if includes.length > 0 %>
 .include:
@@ -52,6 +56,7 @@ raw_config = StringIO.StringIO("""
 """)
 
 config = Config(searchpath=opts.ypath)
+config.load(vagrant_config)
 config.load(includes)
 config.load(raw_config)
 
@@ -122,6 +127,44 @@ module Vagrant
           end
       end
 
+      def get_vagrant_yaml?
+          data = {}
+          vagrant = data['vagrant'] = {}
+          vms = vagrant['vms'] = {}
+
+          env[:vm].env.vms.each do |name, vm|
+              info = {
+                  "name" => vm.name.to_s,
+                  "interfaces" => [],
+                  }
+
+              idx = 1
+              vm.config.vm.networks.each do |type, ips|
+                  ips.each do |ip|
+                      info["interfaces"] << {
+                          "name" => "eth#{idx}",
+                          "address" => ip,
+                          "netmask" => "255.255.255.0",
+                          "gateway" => (ip.split(".").slice(0, 3) + [1]).join("."),
+                          }
+                      idx += 1
+                  end
+              end
+
+              info["interfaces"] << {
+                  "name" => "eth0",
+                  "type" => "dhcp",
+                  }
+
+              vms[name.to_s] = info
+          end
+
+          name = env[:vm].name.to_s
+          vagrant["vm"] = "${vagrant.vms.#{name}}"
+
+          "#" + data.to_yaml
+      end
+
       def provision!
         verify_import "yaybu"
         verify_import "yay"
@@ -136,6 +179,7 @@ module Vagrant
           :ssh_port => env[:vm].ssh.info[:port],
           :private_key_path => env[:vm].ssh.info[:private_key_path],
           :yay => config.yay,
+          :vagrant => get_vagrant_yaml?,
           :searchpath => config.searchpath,
           :includes => config.include,
           })
