@@ -85,6 +85,8 @@ module Vagrant
         attr_accessor :python
         attr_accessor :searchpath
         attr_accessor :include
+        attr_accessor :yay_version
+        attr_accessor :yaybu_version
 
         def initialize
           super
@@ -93,6 +95,9 @@ module Vagrant
           @python = "python"
           @searchpath = []
           @include = []
+
+          @yay_version = nil
+          @yaybu_version = nil
         end
       end
 
@@ -106,9 +111,26 @@ module Vagrant
           ssh.sudo("which yaybu", :error_class => YaybuError, :_key => :yaybu_not_detected, :binary => "yaybu")
         rescue
           env[:ui].info "Yaybu not found so attempting to install it"
+
+          if not config.yay_version then
+              env[:ui].info "yay version not specified in Vagrantfile, determining from host system"
+              config.yay_version = get_local_version?("yay")
+          end
+
+          if not config.yaybu_version then
+              env[:ui].info "Yaybu version not specified in Vagrantfile, determining from host system"
+              config.yaybu_version = get_local_version?("Yaybu")
+          end
+
+          env[:ui].info "Running apt-get updating and checking setuptools"
           ssh.sudo("apt-get update")
           ssh.sudo("apt-get install python-setuptools -y")
-          ssh.sudo("easy_install Yaybu")
+
+          env[:ui].info "Running 'easy_install yay==#{config.yay_version}'"
+          ssh.sudo("easy_install yay==#{config.yay_version}")
+
+          env[:ui].info "Running 'easy_install Yaybu==#{config.yaybu_version}'"
+          ssh.sudo("easy_install Yaybu==#{config.yaybu_version}")
         end
       end
 
@@ -125,6 +147,15 @@ module Vagrant
           if not system("which #{binary}") then
             raise YaybuError.new "Local binary #{binary} not found"
           end
+      end
+
+      def get_local_version?(mod)
+          version = `#{config.python} -c 'print __import__("pkg_resources").get_distribution("#{mod}").version'`.strip
+          if $?.to_i != 0 then
+              raise YaybuError.new "Failed to get host version for '#{mod}'"
+          end
+
+          version
       end
 
       def get_vagrant_yaml?
