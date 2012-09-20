@@ -1,0 +1,47 @@
+Changelog for vagrant-yaybu
+===========================
+
+0.0.6 (2012-02-12)
+------------------
+
+ - Add an automatically generated ``vagrant`` node accessible from yay. This
+   can provide details about all your defined VMs:: 
+
+       vagrant:
+         vms:
+           web:
+             name: web
+             interfaces:
+               - name: eth1
+                 address: 10.33.33.33
+                 netmask: 255.255.255.0
+                 gateway: 10.33.33.1
+
+               - name: eth0
+                 type: dhcp
+
+   To reference eth1 on the current VM you can use::
+
+       ${vagrant.vm.interfaces[0].address}
+
+   Unfortunately you won't be able to access the IP address of eth0 presently.
+   When using vagrant you rarely access the IP directly and have port forwards
+   to localhost on the host. eth0 will always be the last interface in the list.
+
+ - The bootstrap functionality will bootstrap the same version of yay and Yaybu
+   This can be overriden by setting ``yay_version`` and ``yaybu_version`` in
+   your Vagrantfile.
+
+
+0.0.5 (2012-02-18)
+------------------
+
+ - Update to support vagrant 0.9.7+
+
+
+0.0.4 (2012-02-18)
+-------------
+
+ - Update to support vagrant 0.9+
+
+
