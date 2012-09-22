@@ -170,16 +170,15 @@ module Vagrant
                   }
 
               idx = 1
-              vm.config.vm.networks.each do |type, ips|
-                  ips.each do |ip|
-                      info["interfaces"] << {
-                          "name" => "eth#{idx}",
-                          "address" => ip,
-                          "netmask" => "255.255.255.0",
-                          "gateway" => (ip.split(".").slice(0, 3) + [1]).join("."),
-                          }
-                      idx += 1
-                  end
+              vm.config.vm.networks.each do |type, opts|
+                  ip = opts[0]
+                  info["interfaces"] << {
+                      "name" => "eth#{idx}",
+                      "address" => ip,
+                      "netmask" => "255.255.255.0",
+                      "gateway" => (ip.split(".").slice(0, 3) + [1]).join("."),
+                      }
+                  idx += 1
               end
 
               info["interfaces"] << {

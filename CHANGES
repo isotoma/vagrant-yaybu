@@ -1,6 +1,12 @@
 Changelog for vagrant-yaybu
 ===========================
 
+0.0.7 (2012-09-22)
+------------------
+
+ - Don't choke when not using vboxnet0
+
+
 0.0.6 (2012-02-12)
 ------------------
 
