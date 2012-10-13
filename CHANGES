@@ -1,6 +1,16 @@
 Changelog for vagrant-yaybu
 ===========================
 
+0.0.8 (2012-10-13)
+------------------
+
+ - Increase compatibility with standalone Yaybu.
+
+ - ``yaybu.host`` will now be set
+
+ - ``~/.yaybu/defaults.yay`` and ``~/.yaybu/defaults.yay.gpg`` will now be consulted.
+
+
 0.0.7 (2012-09-22)
 ------------------
 

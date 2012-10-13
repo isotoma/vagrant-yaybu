@@ -55,10 +55,40 @@ raw_config = StringIO.StringIO("""
 <%= yay %>
 """)
 
-config = Config(searchpath=opts.ypath)
+yay_config = {
+    "openers": {
+        "packages": {
+            "cachedir": os.path.expanduser("~/.yaybu/packages"),
+            },
+        },
+    }
+
+try:
+    config = Config(searchpath=self.ypath, config=yay_config)
+except:
+    config = Config(searchpath=opts.ypath)
+
+config.add({
+    "yaybu": {
+        "host": "<% hostname %>",
+        }
+    })
+
+defaults = os.path.expanduser("~/.yaybu/defaults.yay")
+if os.path.exists(defaults):
+    c.load_uri(defaults)
+
+defaults_gpg = os.path.expanduser("~/.yaybu/defaults.yay.gpg")
+if os.path.exists(defaults_gpg):
+    config.load_uri(defaults_gpg)
+
 config.load(vagrant_config)
+<% if includes.length > 0 %>
 config.load(includes)
+<% end %>
+<% if not raw_config.empty? %>
 config.load(raw_config)
+<% end %>
 
 ctx = RunContext(None, opts)
 ctx.set_config(config)
@@ -204,6 +234,7 @@ module Vagrant
         bootstrap
 
         deployment_script = TemplateRenderer.render_string($deploy_script, {
+          :hostname => env[:vm].name.to_s,
           :ssh_host => env[:vm].ssh.info[:host],
           :ssh_user => env[:vm].ssh.info[:username],
           :ssh_port => env[:vm].ssh.info[:port],
